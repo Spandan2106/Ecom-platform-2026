@@ -1,0 +1,35 @@
+/* Creative Logo Styles */
+/* This targets images inside the navbar brand link */
+.navbar-brand img, 
+nav img[alt="Logo"],
+.logo-creative {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  position: relative;
+  z-index: 10;
+  border-radius: 8px; /* Soften edges if it's a square logo */
+}
+
+/* Hover Effect: Lift and Glow */
+.navbar-brand:hover img,
+nav:hover img[alt="Logo"] {
+  transform: translateY(-2px) scale(1.05);
+  filter: drop-shadow(0 10px 20px rgba(79, 70, 229, 0.3));
+}
+
+/* Shine Animation Effect */
+@keyframes shine {
+  0% { -webkit-mask-position: -100%; }
+  100% { -webkit-mask-position: 200%; }
+}
+
+.navbar-brand img {
+  /* Optional: Add a subtle continuous float */
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
