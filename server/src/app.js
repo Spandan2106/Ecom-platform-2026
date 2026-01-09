@@ -33,6 +33,9 @@ app.use("/api", apiLimiter);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/users", userRoutes);
 
+app.get("/", (req, res) => {
+  res.send("API is running successfully");
+});
 
 app.use(errorMiddleware);
 
