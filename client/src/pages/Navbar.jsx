@@ -22,6 +22,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo" onClick={closeMenu}>
+          <img src="/logo.JPG" alt="WE_SELL" className="navbar-logo-img" />
           WE_SELL
         </Link>
 
