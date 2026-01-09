@@ -19,10 +19,12 @@ export default function ProductDetails() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { addToCart } = useCart();
   // This gets the current page URL to share
   const shareUrl = window.location.href;
 
+  const API_URL = (import.meta.env.VITE_API_URL || "https://ecom-api-paxi.onrender.com").replace(/\/$/, "");
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -43,6 +45,7 @@ export default function ProductDetails() {
         setLoading(false);
       } catch (err) {
         console.error("Error fetching product details:", err);
+        setError(err.message || "Failed to load product");
         setLoading(false);
       }
     };
@@ -78,6 +81,7 @@ export default function ProductDetails() {
   };
 
   if (loading) return <div className="container"><h2>Loading...</h2></div>;
+  if (error) return <div className="container"><h2 style={{color: 'red'}}>Error: {error}</h2><p>Please check your internet connection or try again later.</p></div>;
   if (!product) return <div className="container"><h2>Product not found</h2></div>;
 
   return (

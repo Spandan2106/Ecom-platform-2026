@@ -13,7 +13,7 @@ export default function UpdateProfile() {
   const navigate = useNavigate();
   const { updateUser, notify } = useAuth();
 
-  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+  const API_URL = (import.meta.env.VITE_API_URL || "https://ecom-api-paxi.onrender.com").replace(/\/$/, "");
 
   useEffect(() => {
     const fetchProfile = async () => {
