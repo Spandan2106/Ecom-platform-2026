@@ -163,20 +163,6 @@ export default function ProductDetails() {
       <p>₹{p.price}</p>
       <button onClick={() => addToCart(p)}>Add to Cart</button>
     </div>
-    <div style={{ marginTop: "1.5rem" }}>
-      <h4 style={{ marginBottom: "0.5rem" }}>Share this product:</h4>
-      <div style={{ display: "flex", gap: "10px" }}>
-        <FacebookShareButton url={shareUrl} quote={product?.name}>
-          <FacebookIcon size={32} round />
-        </FacebookShareButton>
-        <TwitterShareButton url={shareUrl} title={product?.name}>
-          <TwitterIcon size={32} round />
-        </TwitterShareButton>
-        <WhatsappShareButton url={shareUrl} title={product?.name} separator=":: ">
-          <WhatsappIcon size={32} round />
-        </WhatsappShareButton>
-      </div>
-    </div>
   </div>
 ))}
           </div>
