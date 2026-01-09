@@ -38,7 +38,7 @@ export default function Wallet() {
   const [showPinSetModal, setShowPinSetModal] = useState(false);
   const [newPin, setNewPin] = useState("");
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://ecom-api-paxi.onrender.com";
 
   const luhnCheck = (val) => {
     // Allow a common test card number for easier testing

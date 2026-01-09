@@ -8,7 +8,7 @@ export default function ForgotPassword() {
   const [resetLink, setResetLink] = useState("");
   const [error, setError] = useState("");
 
-  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+  const API_URL = (import.meta.env.VITE_API_URL || "https://ecom-api-paxi.onrender.com").replace(/\/$/, "");
 
   const handleSubmit = async (e) => {
     e.preventDefault();

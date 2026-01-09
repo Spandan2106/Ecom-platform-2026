@@ -27,7 +27,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       // Add timestamp to prevent caching
-      const { data } = await axios.get(`http://localhost:5000/api/users/profile?t=${new Date().getTime()}`, config);
+      const API_URL = (import.meta.env.VITE_API_URL || "https://ecom-api-paxi.onrender.com").replace(/\/$/, "");
+      const { data } = await axios.get(`${API_URL}/api/users/profile?t=${new Date().getTime()}`, config);
       setUser(data);
       localStorage.setItem('user', JSON.stringify(data));
     } catch (error) {
