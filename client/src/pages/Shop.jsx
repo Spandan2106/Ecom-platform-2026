@@ -22,6 +22,8 @@ export default function Shop() {
   
   const { addToCart } = useCart();
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -60,7 +62,7 @@ export default function Shop() {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/products");
+      const { data } = await axios.get(`${API_URL}/api/products`);
       setProducts(data);
       // Extract unique categories
       const uniqueCategories = ["All", ...new Set(data.map(p => p.category).filter(Boolean))];

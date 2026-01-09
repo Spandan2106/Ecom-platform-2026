@@ -11,12 +11,14 @@ export default function Home() {
   const [error, setError] = useState(null);
   const { addToCart } = useCart();
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await axios.get("http://localhost:5000/api/products");
+        const res = await axios.get(`${API_URL}/api/products`);
         const allProducts = Array.isArray(res.data) ? res.data : [];
         const shuffled = allProducts.sort(() => 0.5 - Math.random());
         setFeaturedProducts(shuffled.slice(0, 3));
