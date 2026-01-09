@@ -24,6 +24,8 @@ export default function History() {
     console.error("Error parsing user data:", error);
   }
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchOrders = async () => {
       if (!user) return;
@@ -31,7 +33,7 @@ export default function History() {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        const { data: responseData } = await axios.get(`http://localhost:5000/api/orders/my-orders?page=${page}&keyword=${keyword}&t=${new Date().getTime()}`, config); // Add timestamp to prevent caching
+        const { data: responseData } = await axios.get(`${API_URL}/api/orders/my-orders?page=${page}&keyword=${keyword}&t=${new Date().getTime()}`, config); // Add timestamp to prevent caching
         setOrders(responseData.orders);
         setPage(responseData.page);
         setPages(responseData.pages);
@@ -54,7 +56,7 @@ export default function History() {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.put(`http://localhost:5000/api/orders/${orderId}/cancel`, {}, config);
+        await axios.put(`${API_URL}/api/orders/${orderId}/cancel`, {}, config);
         setOrders(prevOrders => prevOrders.map(o => o._id === orderId ? { ...o, status: 'Cancelled' } : o));
         toast.success("Order cancelled successfully");
       } catch (error) {
@@ -69,7 +71,7 @@ export default function History() {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.delete(`http://localhost:5000/api/orders/${orderId}`, config);
+        await axios.delete(`${API_URL}/api/orders/${orderId}`, config);
         setOrders(prevOrders => prevOrders.filter(o => o._id !== orderId));
         toast.success("Order deleted successfully");
       } catch (error) {
@@ -83,7 +85,7 @@ export default function History() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`http://localhost:5000/api/orders/${orderId}/pay`, {}, config);
+      await axios.put(`${API_URL}/api/orders/${orderId}/pay`, {}, config);
       setOrders(prevOrders => prevOrders.map(o => o._id === orderId ? { ...o, isPaid: true, paidAt: new Date().toISOString() } : o));
       toast.success("Order marked as paid");
     } catch (error) {
@@ -104,7 +106,7 @@ export default function History() {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.delete("http://localhost:5000/api/users/profile", config);
+        await axios.delete(`${API_URL}/api/users/profile`, config);
         
         localStorage.removeItem("token");
         localStorage.removeItem("user");

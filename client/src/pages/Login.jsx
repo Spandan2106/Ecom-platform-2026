@@ -9,10 +9,12 @@ export default function Login() {
   const navigate = useNavigate();
   const { login, notify } = useAuth();
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("http://localhost:5000/api/users/login", {
+      const { data } = await axios.post(`${API_URL}/api/users/login`, {
         email: formData.email.trim(),
         password: formData.password,
         rememberMe

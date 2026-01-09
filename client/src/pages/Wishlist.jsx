@@ -9,6 +9,8 @@ export default function Wishlist() {
   const { addToCart } = useCart();
   const [loading, setLoading] = useState(true);
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
@@ -16,7 +18,7 @@ export default function Wishlist() {
         if (!token) return;
         
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        const { data } = await axios.get("http://localhost:5000/api/auth/wishlist", config);
+        const { data } = await axios.get(`${API_URL}/api/auth/wishlist`, config);
         setWishlist(data);
       } catch (error) {
         console.error("Error fetching wishlist:", error);
@@ -31,7 +33,7 @@ export default function Wishlist() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.put("http://localhost:5000/api/auth/wishlist", { productId }, config);
+      const { data } = await axios.put(`${API_URL}/api/auth/wishlist`, { productId }, config);
       setWishlist(data);
       toast.success("Removed from wishlist");
     } catch (error) {

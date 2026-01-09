@@ -11,6 +11,8 @@ export default function ResetPassword() {
   const { resetToken } = useParams();
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -19,7 +21,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const { data } = await axios.put(`http://localhost:5000/api/auth/reset-password/${resetToken}`, { password });
+      const { data } = await axios.put(`${API_URL}/api/auth/reset-password/${resetToken}`, { password });
       toast.success(data.message);
       setError("");
       setTimeout(() => {

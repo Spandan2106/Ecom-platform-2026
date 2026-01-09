@@ -13,6 +13,8 @@ export default function UpdateProfile() {
   const navigate = useNavigate();
   const { updateUser, notify } = useAuth();
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
@@ -22,7 +24,7 @@ export default function UpdateProfile() {
       }
       try {
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        const { data } = await axios.get("http://localhost:5000/api/users/profile", config);
+        const { data } = await axios.get(`${API_URL}/api/users/profile`, config);
         setName(data.name);
         setEmail(data.email);
       } catch (err) {
@@ -46,7 +48,7 @@ export default function UpdateProfile() {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const { data } = await axios.put(
-        "http://localhost:5000/api/users/profile",
+        `${API_URL}/api/users/profile`,
         { name, email, password },
         config
       );
