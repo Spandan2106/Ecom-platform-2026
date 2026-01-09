@@ -21,7 +21,7 @@ app.use(helmet());
 app.use(mongoSanitize());
 app.use(xss());
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: [process.env.CLIENT_URL, "https://ecom-platform-2026-git-main-spandan-das-s-projects.vercel.app", "https://ecom-platform-2026.vercel.app"],
   credentials: true
 }));
 
