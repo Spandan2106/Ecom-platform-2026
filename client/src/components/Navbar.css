@@ -50,9 +50,10 @@
   align-items: center;
 }
 
-.navbar-logo-img {
-  height: 40px;
-  margin-right: 10px;
+/* Ensure image inside brand scales correctly */
+.navbar-brand img {
+  height: 50px; /* Adjusted to match your h2 size */
+  margin-right: 15px;
 }
 
 .nav-menu {
