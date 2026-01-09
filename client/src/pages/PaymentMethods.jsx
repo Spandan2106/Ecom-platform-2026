@@ -14,7 +14,7 @@ export default function PaymentMethods() {
   const subtotal = items ? items.reduce((sum, item) => sum + item.price, 0) : 0;
   const total = subtotal - (discount || 0);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
   if (!items) {
     return <div className="container">No items to checkout.</div>;

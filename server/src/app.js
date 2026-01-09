@@ -21,7 +21,13 @@ app.use(helmet());
 app.use(mongoSanitize());
 app.use(xss());
 app.use(cors({
-  origin: [process.env.CLIENT_URL, "https://ecom-platform-2026-git-main-spandan-das-s-projects.vercel.app", "https://ecom-platform-2026.vercel.app"],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // Allow ANY origin so anyone can test from mobile/local network
+    return callback(null, true);
+  },
   credentials: true
 }));
 

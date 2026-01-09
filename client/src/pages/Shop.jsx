@@ -14,6 +14,7 @@ export default function Shop() {
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });
   const [sortBy, setSortBy] = useState("newest");
+  const [showFilters, setShowFilters] = useState(true);
 
   // State for Pagination and Quick View
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,8 +102,15 @@ export default function Shop() {
   if (loading) return <div className="shop-container"><h2>Loading Shop...</h2></div>;
 
   return (
-    <div className="shop-container">
+    <div className="shop-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+      <div style={{ width: '100%', marginBottom: '1rem', display: 'block' }}>
+        <button onClick={() => setShowFilters(!showFilters)} style={{ padding: '0.5rem 1rem', background: '#eee', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+          {showFilters ? "Hide Filters" : "Show Filters ⇩"}
+        </button>
+      </div>
+
       {/* Sidebar */}
+      {showFilters && (
       <aside className="shop-sidebar">
         <div className="filter-group">
           <h3>Categories</h3>
@@ -139,9 +147,10 @@ export default function Shop() {
           </div>
         </div>
       </aside>
+      )}
 
       {/* Main Content */}
-      <main className="shop-content">
+      <main className="shop-content" style={{ flex: 1, minWidth: '300px' }}>
         <div className="shop-header">
           <h2>Shop All Products ({filteredProducts.length})</h2>
           <div className="search-bar">

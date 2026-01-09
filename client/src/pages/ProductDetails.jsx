@@ -82,7 +82,7 @@ export default function ProductDetails() {
 
   return (
     <div className="container">
-      <div className="product-details-wrapper">
+      <div className="product-details-wrapper" style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
         <div className="details-image">
           <img 
             src={product.imageUrl || "https://via.placeholder.com/400"} 

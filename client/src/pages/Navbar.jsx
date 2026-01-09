@@ -73,7 +73,7 @@ export default function Navbar() {
           
           <li className="nav-item">
             <Link to="/cart" className="nav-links cart-icon" onClick={closeMenu}>
-              Cart ({cartItems?.length || 0})
+              Cart ({cartItems.length})
             </Link>
           </li>
         </ul>

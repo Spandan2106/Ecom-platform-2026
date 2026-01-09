@@ -24,7 +24,7 @@ export default function History() {
     console.error("Error parsing user data:", error);
   }
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
   useEffect(() => {
     const fetchOrders = async () => {
