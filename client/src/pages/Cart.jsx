@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
 export default function Cart() {
-  const { cart, removeFromCart } = useCart();
+  const { cart, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -13,7 +13,7 @@ export default function Cart() {
     setIsLoggedIn(!!token);
   }, []);
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const total = cart.reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
 
   if (!isLoggedIn) {
     return (
@@ -33,10 +33,16 @@ export default function Cart() {
             <div key={item.cartItemId} className="cart-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
               <div>
                 <h3 style={{ margin: 0 }}>{item.name}</h3>
-                <p style={{ margin: '0.25rem 0 0 0' }}>₹{item.price}</p>
+                <p style={{ margin: '0.25rem 0 0 0' }}>₹{item.price} x {item.qty || 1}</p>
               </div>
-              <div>
-                <button onClick={() => navigate("/checkout", { state: { items: [item] } })} style={{ background: '#28a745', marginRight: '10px' }}>Buy Now</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginRight: '10px' }}>
+                  <button onClick={() => updateQuantity(item.cartItemId, (item.qty || 1) - 1)} disabled={(item.qty || 1) <= 1} style={{ padding: '5px 10px' }}>-</button>
+                  <span>{item.qty || 1}</span>
+                  <button onClick={() => updateQuantity(item.cartItemId, (item.qty || 1) + 1)} style={{ padding: '5px 10px' }}>+</button>
+                </div>
+                
+                <button onClick={() => navigate("/checkout", { state: { items: [{...item, qty: item.qty || 1}] } })} style={{ background: '#28a745', marginRight: '10px' }}>Buy Now</button>
                 <button onClick={() => {
                   removeFromCart(item.cartItemId);
                   toast.success("Item removed");
@@ -46,7 +52,7 @@ export default function Cart() {
           ))}
           <hr />
           <h2 style={{textAlign: 'right'}}>Total: ₹{total}</h2>
-          <button onClick={() => navigate("/checkout")}>Proceed to Checkout</button>
+          <button onClick={() => navigate("/checkout", { state: { items: cart } })}>Proceed to Checkout</button>
         </div>
       )}
     </div>

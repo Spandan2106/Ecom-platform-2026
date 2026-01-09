@@ -7,7 +7,7 @@ import "./Navbar.css";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
-  const { cartItems } = useCart();
+  const { cart } = useCart();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -86,7 +86,7 @@ export default function Navbar() {
           
           <li className="nav-item">
             <Link to="/cart" className="nav-links cart-icon" onClick={closeMenu}>
-              Cart ({cartItems?.length || 0})
+              Cart ({cart?.length || 0})
             </Link>
           </li>
         </ul>

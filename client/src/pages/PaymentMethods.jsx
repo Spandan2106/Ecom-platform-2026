@@ -11,7 +11,7 @@ export default function PaymentMethods() {
   const { user, notify } = useAuth();
   
   const { items, address, discount } = location.state || {};
-  const subtotal = items ? items.reduce((sum, item) => sum + item.price, 0) : 0;
+  const subtotal = items ? items.reduce((sum, item) => sum + item.price * (item.qty || 1), 0) : 0;
   const total = subtotal - (discount || 0);
 
   const API_URL = (import.meta.env.VITE_API_URL || "https://ecom-api-paxi.onrender.com").replace(/\/$/, "");
@@ -31,7 +31,7 @@ export default function PaymentMethods() {
       const orderData = {
         orderItems: items.map(item => ({
           name: item.name,
-          qty: 1,
+          qty: item.qty || 1,
           image: item.image,
           price: item.price,
           product: item._id

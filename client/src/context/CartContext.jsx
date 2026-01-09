@@ -20,10 +20,16 @@ export const CartProvider = ({ children }) => {
   }, [cart]);
 
   const addToCart = useCallback((product) => {
-    // Add a unique id to each item for keying and removal
-    const newItem = { ...product, cartItemId: `${product._id}-${Date.now()}` };
-    setCart(prevCart => [...prevCart, newItem]);
-    alert(`${product.name} added to cart!`);
+    setCart(prevCart => {
+      const existingItem = prevCart.find(item => item._id === product._id);
+      if (existingItem) {
+        return prevCart.map(item => 
+          item._id === product._id ? { ...item, qty: (item.qty || 1) + 1 } : item
+        );
+      }
+      return [...prevCart, { ...product, qty: 1, cartItemId: `${product._id}-${Date.now()}` }];
+    });
+    // alert(`${product.name} added to cart!`); // Optional: removed to reduce spam or use toast in component
   }, []);
 
   const removeFromCart = useCallback((cartItemId) => {
@@ -34,7 +40,13 @@ export const CartProvider = ({ children }) => {
     setCart([]);
   }, []);
 
-  const value = { cart, addToCart, removeFromCart, clearCart };
+  const updateQuantity = useCallback((cartItemId, qty) => {
+    setCart(prevCart => prevCart.map(item => 
+      item.cartItemId === cartItemId ? { ...item, qty: Math.max(1, qty) } : item
+    ));
+  }, []);
+
+  const value = { cart, addToCart, removeFromCart, clearCart, updateQuantity };
 
   return (
     <CartContext.Provider value={value}>
