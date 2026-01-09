@@ -3,11 +3,13 @@ import axios from "axios";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
+  
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    axios.get("http://localhost:5000/api/orders/my-orders", {
+    axios.get(`${API_URL}/api/orders/my-orders`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => setOrders(res.data));
   }, []);

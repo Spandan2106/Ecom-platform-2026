@@ -9,6 +9,8 @@ export default function AdminDashboard() {
     name: "", price: "", category: "", description: "", imageUrl: "", stock: ""
   });
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const token = localStorage.getItem("token");
   const config = { headers: { Authorization: `Bearer ${token}` } };
 
@@ -19,10 +21,10 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     try {
       if (activeTab === "products") {
-        const res = await axios.get("http://localhost:5000/api/products");
+        const res = await axios.get(`${API_URL}/api/products`);
         setProducts(res.data);
       } else {
-        const res = await axios.get("http://localhost:5000/api/admin/orders", config);
+        const res = await axios.get(`${API_URL}/api/admin/orders`, config);
         setOrders(res.data);
       }
     } catch (err) {
@@ -33,7 +35,7 @@ export default function AdminDashboard() {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/admin/products", newProduct, config);
+      await axios.post(`${API_URL}/api/admin/products`, newProduct, config);
       alert("Product added!");
       setNewProduct({ name: "", price: "", category: "", description: "", imageUrl: "", stock: "" });
       fetchData();
@@ -45,7 +47,7 @@ export default function AdminDashboard() {
   const handleDeleteProduct = async (id) => {
     if (window.confirm("Are you sure?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/admin/products/${id}`, config);
+        await axios.delete(`${API_URL}/api/admin/products/${id}`, config);
         fetchData();
       } catch (err) {
         alert("Error deleting product");
@@ -55,7 +57,7 @@ export default function AdminDashboard() {
 
   const handleStatusUpdate = async (id, status) => {
     try {
-      await axios.put(`http://localhost:5000/api/admin/orders/${id}`, { status }, config);
+      await axios.put(`${API_URL}/api/admin/orders/${id}`, { status }, config);
       fetchData();
     } catch (err) {
       alert("Error updating status");

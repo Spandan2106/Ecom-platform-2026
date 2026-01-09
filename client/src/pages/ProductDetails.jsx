@@ -29,13 +29,13 @@ export default function ProductDetails() {
       try {
         setLoading(true);
         // Fetch current product
-        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const res = await axios.get(`${API_URL}/api/products/${id}`);
         setProduct(res.data); // Product data now includes reviews from backend if populated, but we are sending them separately in controller
         setReviews(res.data.reviews || []);
         
         // Fetch related products based on category
         if (res.data.category) {
-          const relatedRes = await axios.get(`http://localhost:5000/api/products?category=${res.data.category}`);
+          const relatedRes = await axios.get(`${API_URL}/api/products?category=${res.data.category}`);
           // Filter out the current product and limit to 4 items
           const related = relatedRes.data.filter(p => p._id !== id).slice(0, 4);
           setRelatedProducts(related);
@@ -56,7 +56,7 @@ export default function ProductDetails() {
       const token = localStorage.getItem("token");
       if (!token) return alert("Please login to add to wishlist");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put("http://localhost:5000/api/auth/wishlist", { productId: product._id }, config);
+      await axios.put(`${API_URL}/api/auth/wishlist`, { productId: product._id }, config);
       alert("Wishlist updated!");
     } catch (error) {
       alert("Error updating wishlist");
@@ -69,7 +69,7 @@ export default function ProductDetails() {
       const token = localStorage.getItem("token");
       if (!token) return alert("Please login to review");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.post(`http://localhost:5000/api/products/${id}/reviews`, { rating, comment }, config);
+      const { data } = await axios.post(`${API_URL}/api/products/${id}/reviews`, { rating, comment }, config);
       setReviews([...reviews, data]);
       setComment("");
     } catch (error) {

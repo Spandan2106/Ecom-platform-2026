@@ -14,6 +14,8 @@ export default function WalletHistory() {
   const navigate = useNavigate();
   const { items, address, total } = location.state || {};
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -22,7 +24,7 @@ export default function WalletHistory() {
         const config = { headers: { Authorization: `Bearer ${token}` } };
         
         // Fetch orders with pagination and filter by payment method
-        let url = `http://localhost:5000/api/orders/my-orders?page=${page}&paymentMethod=We Sell Pay Balance`;
+        let url = `${API_URL}/api/orders/my-orders?page=${page}&paymentMethod=We Sell Pay Balance`;
         if (startDate) url += `&startDate=${startDate}`;
         if (endDate) url += `&endDate=${endDate}`;
         const { data } = await axios.get(url, config);
