@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import "./Checkout.css";
 
 export default function Checkout() {
   const { cart } = useCart();
@@ -35,40 +36,40 @@ export default function Checkout() {
   };
 
   return (
-    <div className="container">
-      <h1>Checkout</h1>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
-        <div className="form-container" style={{ margin: 0, maxWidth: "100%" }}>
-          <h3>Shipping Address</h3>
-          <form onSubmit={handleProceed}>
-            <input placeholder="Address" value={address.address} onChange={e => setAddress({...address, address: e.target.value})} required />
-            <input placeholder="City" value={address.city} onChange={e => setAddress({...address, city: e.target.value})} required />
-            <input placeholder="Postal Code" value={address.postalCode} onChange={e => setAddress({...address, postalCode: e.target.value})} required />
-            <input placeholder="Country" value={address.country} onChange={e => setAddress({...address, country: e.target.value})} required />
-            <button type="submit" style={{ width: "100%", marginTop: "1rem" }}>Proceed to Payment</button>
+    <div className="checkout-container">
+      <h1 className="checkout-title">Checkout</h1>
+      <div className="checkout-grid">
+        <div className="shipping-section">
+          <h3 className="section-title">Shipping Address</h3>
+          <form onSubmit={handleProceed} className="checkout-form">
+            <input className="checkout-input" placeholder="Address" value={address.address} onChange={e => setAddress({...address, address: e.target.value})} required />
+            <input className="checkout-input" placeholder="City" value={address.city} onChange={e => setAddress({...address, city: e.target.value})} required />
+            <input className="checkout-input" placeholder="Postal Code" value={address.postalCode} onChange={e => setAddress({...address, postalCode: e.target.value})} required />
+            <input className="checkout-input" placeholder="Country" value={address.country} onChange={e => setAddress({...address, country: e.target.value})} required />
+            <button type="submit" className="proceed-btn">Proceed to Payment</button>
           </form>
         </div>
 
-        <div style={{ background: "white", padding: "2rem", borderRadius: "1rem", height: "fit-content" }}>
-          <h3>Order Summary</h3>
+        <div className="summary-section">
+          <h3 className="section-title">Order Summary</h3>
           {checkoutItems.map((item, index) => (
-            <div key={index} style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+            <div key={index} className="summary-item">
               <span>{item.name}</span>
               <span>₹{item.price}</span>
             </div>
           ))}
-          <hr />
-          <div style={{ marginBottom: "1rem", display: "flex", gap: "10px" }}>
+          <hr className="summary-divider" />
+          <div className="coupon-row">
             <input 
-              placeholder="Coupon Code" 
+              className="coupon-input"
+              placeholder="Coupon Code (e.g. SAVE10)" 
               value={coupon} 
               onChange={(e) => setCoupon(e.target.value)} 
-              style={{ padding: "8px", flex: 1 }}
             />
-            <button type="button" onClick={applyCoupon} style={{ padding: "8px 15px", background: "#007bff" }}>Apply</button>
+            <button type="button" onClick={applyCoupon} className="apply-btn">Apply</button>
           </div>
-          {discount > 0 && <p style={{ textAlign: "right", color: "green" }}>Discount: -₹{discount.toFixed(2)}</p>}
-          <h3 style={{ textAlign: "right" }}>Total: ₹{finalTotal.toFixed(2)}</h3>
+          {discount > 0 && <p className="discount-text">Discount: -₹{discount.toFixed(2)}</p>}
+          <h3 className="total-text">Total: ₹{finalTotal.toFixed(2)}</h3>
         </div>
       </div>
     </div>

@@ -22,8 +22,9 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="nav-logo" > 
-        <img src="/logo.jpeg" alt="WE_SELL Logo" className="logo" width="100" height="60"/>
+      <Link to="/" className="navbar-brand">
+        <img src="/logo.JPG" alt="WE_SELL Logo" />
+        WE_SELL
       </Link>
 
       <div className="nav-links">

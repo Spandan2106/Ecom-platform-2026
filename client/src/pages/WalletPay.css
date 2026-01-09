@@ -1,0 +1,208 @@
+.wallet-pay-container {
+  max-width: 500px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.wallet-pay-title {
+  margin-bottom: 2rem;
+  color: #1f2937;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.payment-summary-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #4b5563;
+}
+
+.summary-row.total {
+  font-weight: 700;
+  color: #111827;
+  font-size: 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.balance-status {
+  text-align: center;
+  margin-top: 1rem;
+  font-weight: 600;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.balance-status.sufficient {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.balance-status.insufficient {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.pay-btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pay-btn:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.pay-btn.primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+}
+
+.pay-btn.primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
+}
+
+.pay-btn.retry {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
+}
+
+/* Modal Styles */
+.pin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.pin-modal-content {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  width: 340px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.pin-display {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 2rem 0;
+}
+
+.pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s;
+}
+
+.pin-dot.filled {
+  background-color: #111827;
+  border-color: #111827;
+}
+
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.keypad-btn {
+  padding: 1.2rem 0;
+  font-size: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #f3f4f6;
+  background: #fff;
+  color: #1f2937;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.keypad-btn:hover {
+  background: #f9fafb;
+}
+
+.keypad-btn:active {
+  background: #e5e7eb;
+}
+
+.keypad-btn.action-btn {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.keypad-btn.cancel {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fee2e2;
+}
+
+.keypad-btn.backspace {
+  color: #4b5563;
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+.confirm-pin-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #111827;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.confirm-pin-btn:hover {
+  opacity: 0.9;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

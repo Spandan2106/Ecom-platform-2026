@@ -24,6 +24,7 @@ export default function FAQ() {
         <h3>Can I return an item?</h3>
         <p>Yes, we accept returns within 30 days of purchase. Please visit our Returns page for more details.</p>
       </div>
+
     </div>
   );
 }

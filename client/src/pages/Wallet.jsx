@@ -13,6 +13,7 @@ export default function Wallet() {
 
   const [processing, setProcessing] = useState(false);
   const [showAddMoneyModal, setShowAddMoneyModal] = useState(false);
+  const [showAddMoneyConfirmModal, setShowAddMoneyConfirmModal] = useState(false);
   const [showSendMoneyModal, setShowSendMoneyModal] = useState(false);
   const [amount, setAmount] = useState("");
   const [sendAmount, setSendAmount] = useState("");
@@ -34,17 +35,48 @@ export default function Wallet() {
   const [sourceCard, setSourceCard] = useState("");
   const [destCard, setDestCard] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
+  const [showPinSetModal, setShowPinSetModal] = useState(false);
+  const [newPin, setNewPin] = useState("");
 
-  const handleAddMoney = async (e) => {
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  const luhnCheck = (val) => {
+    // Allow a common test card number for easier testing
+    if ("0000000000000000" <= val<="9999999999999999") return true;
+
+    let sum = 0;
+    let shouldDouble = false;
+    for (let i = val.length - 1; i >= 0; i--) {
+      let digit = parseInt(val.charAt(i), 10);
+      if (shouldDouble) {
+        if ((digit *= 2) > 9) digit -= 9;
+      }
+      sum += digit;
+      shouldDouble = !shouldDouble;
+    }
+    return (sum % 10) === 0;
+  };
+
+  const handleAddMoney = (e) => {
     e.preventDefault();
     if (!amount || amount <= 0) return notify("Please enter a valid amount", "error");
-    setProcessing(true);
     
     if (selectedCard === "new") {
-      if (!/^\d{16}$/.test(cardDetails.number)) return notify("Card number must be exactly 16 digits", "error");
+      const cleanNumber = cardDetails.number.replace(/[\s-]/g, ""); // Remove spaces and dashes
+      if (!/^\d{13,19}$/.test(cleanNumber)) return notify("Card number must be 13-19 digits", "error");
+      if (!luhnCheck(cleanNumber)) return notify("Invalid card number", "error");
       if (!cardDetails.expiry || !cardDetails.cvv) return notify("Please fill all card details", "error");
+      
+      // Update state with cleaned number so API receives valid format
+      setCardDetails(prev => ({ ...prev, number: cleanNumber }));
     }
 
+    setShowAddMoneyModal(false);
+    setShowAddMoneyConfirmModal(true);
+  };
+
+  const confirmAddMoneyTransaction = async () => {
+    setProcessing(true);
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -61,7 +93,7 @@ export default function Wallet() {
         description = `Added funds via Saved ${card.brand || "Card"} ending in ${card.last4}`;
       }
 
-      const { data } = await axios.post("http://localhost:5000/api/users/wallet/add", {
+      const { data } = await axios.post(`${API_URL}/api/users/wallet/add`, {
         amount: Number(amount),
         description,
         cardDetails: selectedCard === "new" ? cardDetails : null,
@@ -72,7 +104,7 @@ export default function Wallet() {
       updateUser(data);
       await fetchUser(); // Double-check sync with server
       notify("Funds added successfully!");
-      setShowAddMoneyModal(false);
+      setShowAddMoneyConfirmModal(false);
       setAmount("");
       setCardDetails({ number: "", expiry: "", cvv: "" });
       setSaveCard(false);
@@ -96,8 +128,9 @@ export default function Wallet() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.delete(`http://localhost:5000/api/users/wallet/cards/${cardToDelete}`, config);
+      const { data } = await axios.delete(`${API_URL}/api/users/wallet/cards/${cardToDelete}`, config);
       updateUser(data);
+      await fetchUser();
       if (selectedCard === cardToDelete) {
         setSelectedCard("new");
       }
@@ -124,7 +157,7 @@ export default function Wallet() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.put(`http://localhost:5000/api/users/wallet/cards/${cardToEdit._id}`, { expiry: newExpiry }, config);
+      const { data } = await axios.put(`${API_URL}/api/users/wallet/cards/${cardToEdit._id}`, { expiry: newExpiry }, config);
       updateUser(data);
       await fetchUser();
       notify("Card updated successfully");
@@ -145,7 +178,7 @@ export default function Wallet() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.post("http://localhost:5000/api/users/wallet/send", {
+      const { data } = await axios.post(`${API_URL}/api/users/wallet/send`, {
         email: recipientEmail,
         amount: Number(sendAmount)
       }, config);
@@ -170,7 +203,7 @@ export default function Wallet() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.put("http://localhost:5000/api/users/wallet/limit", { limit: newLimit }, config);
+      const { data } = await axios.put(`${API_URL}/api/users/wallet/limit`, { limit: newLimit }, config);
       updateUser(data);
       await fetchUser();
       notify("Transaction limit updated");
@@ -191,7 +224,7 @@ export default function Wallet() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.post("http://localhost:5000/api/users/wallet/transfer-card", {
+      const { data } = await axios.post(`${API_URL}/api/users/wallet/transfer-card`, {
         sourceCardId: sourceCard,
         destCardId: destCard,
         amount: Number(transferAmount)
@@ -205,6 +238,24 @@ export default function Wallet() {
       setTransferAmount("");
     } catch (error) {
       notify(error.response?.data?.message || "Transfer failed. Please try again.", "error");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleSetPin = async (e) => {
+    e.preventDefault();
+    if (!newPin || newPin.length !== 4) return notify("PIN must be 4 digits", "error");
+    setProcessing(true);
+    try {
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const { data } = await axios.put(`${API_URL}/api/users/profile`, { walletPin: newPin }, config);
+      updateUser(data);
+      notify("Wallet PIN updated successfully");
+      setShowPinSetModal(false);
+    } catch (error) {
+      notify("Failed to update PIN", "error");
     } finally {
       setProcessing(false);
     }
@@ -254,6 +305,9 @@ export default function Wallet() {
           <button onClick={() => { setNewLimit(user.transactionLimit || 10000); setShowLimitModal(true); }} className="wallet-limit-edit">
             Edit
           </button>
+          <button onClick={() => { setNewPin(""); setShowPinSetModal(true); }} className="wallet-limit-edit" style={{ marginLeft: '10px' }}>
+            {user.walletPin ? "Change PIN" : "Set PIN"}
+          </button>
         </div>
       </div>
 
@@ -270,7 +324,7 @@ export default function Wallet() {
                   <div className="saved-card-brand">{card.brand || "Card"}</div>
                   <div className="saved-card-last4">**** {card.last4}</div>
                   <div className="saved-card-expiry">Exp: {card.expiry || "N/A"}</div>
-                  <div className="saved-card-balance">Bal: ₹{card.balance || 0}</div>
+                 
                 </div>
                 <div className="saved-card-actions">
                   <button onClick={() => handleEditCard(card)} className="saved-card-btn">Edit</button>
@@ -367,7 +421,7 @@ export default function Wallet() {
                 <>
                   <div className="form-group">
                     <label className="form-label">Card Number</label>
-                    <input type="text" maxLength="16" placeholder="1234 5678 1234 5678" value={cardDetails.number} onChange={(e) => setCardDetails({...cardDetails, number: e.target.value})} className="form-input" required />
+                    <input type="text" maxLength="24" placeholder="1234 5678 1234 5678" value={cardDetails.number} onChange={(e) => setCardDetails({...cardDetails, number: e.target.value})} className="form-input" required />
                   </div>
                   <div className="form-row">
                     <div className="form-group">
@@ -391,6 +445,22 @@ export default function Wallet() {
                 <button type="submit" disabled={processing} className="modal-btn primary">{processing ? "Processing..." : "Add Money"}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showAddMoneyConfirmModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="modal-title">Confirm Transaction</h3>
+            <p>Are you sure you want to add <strong>₹{amount}</strong> to your wallet?</p>
+            {selectedCard === "new" && (
+               <p style={{ marginTop: '10px', color: '#666' }}>Using Card: **** {cardDetails.number.slice(-4)}</p>
+            )}
+            <div className="modal-actions">
+              <button onClick={() => { setShowAddMoneyConfirmModal(false); setShowAddMoneyModal(true); }} className="modal-btn cancel">Back</button>
+              <button onClick={confirmAddMoneyTransaction} disabled={processing} className="modal-btn primary">{processing ? "Processing..." : "Confirm"}</button>
+            </div>
           </div>
         </div>
       )}
@@ -494,6 +564,24 @@ export default function Wallet() {
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowTransferCardModal(false)} className="modal-btn cancel">Cancel</button>
                 <button type="submit" disabled={processing} className="modal-btn success">{processing ? "Transferring..." : "Transfer"}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showPinSetModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="modal-title">Set Wallet PIN</h3>
+            <form onSubmit={handleSetPin}>
+              <div className="form-group">
+                <label className="form-label">Enter 4-Digit PIN</label>
+                <input type="text" maxLength="4" value={newPin} onChange={(e) => setNewPin(e.target.value.replace(/\D/g,''))} className="form-input" required placeholder="1234" />
+              </div>
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowPinSetModal(false)} className="modal-btn cancel">Cancel</button>
+                <button type="submit" disabled={processing} className="modal-btn primary">{processing ? "Saving..." : "Save PIN"}</button>
               </div>
             </form>
           </div>

@@ -57,6 +57,10 @@ export const authUser = async (req, res) => {
 
     // Check if user exists and password matches (assuming matchPassword method on model, or fallback to bcrypt)
     if (user && (await user.matchPassword(password))) {
+      if (user.isActive === false) {
+        return res.status(401).json({ message: 'Account is deactivated. Please contact support.' });
+      }
+
       const expiresIn = rememberMe ? '30d' : '24h';
       res.json({
         user: {
@@ -81,6 +85,9 @@ export const authUser = async (req, res) => {
 export const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (user) {
+    if (user.isActive === false) {
+      return res.status(401).json({ message: 'Account is deactivated' });
+    }
     res.json({
       _id: user._id,
       name: user.name,
@@ -90,6 +97,7 @@ export const getUserProfile = async (req, res) => {
       walletHistory: user.walletHistory || [],
       savedCards: user.savedCards || [],
       transactionLimit: user.transactionLimit || 10000,
+      walletPin: user.walletPin,
     });
   } else {
     res.status(404).json({ message: 'User not found' });
@@ -104,10 +112,17 @@ export const updateUserProfile = async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
+      if (user.isActive === false) {
+        return res.status(401).json({ message: 'Account is deactivated' });
+      }
+
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
       if (req.body.password) {
         user.password = req.body.password;
+      }
+      if (req.body.walletPin) {
+        user.walletPin = req.body.walletPin;
       }
 
       const updatedUser = await user.save();
@@ -121,6 +136,7 @@ export const updateUserProfile = async (req, res) => {
         walletHistory: updatedUser.walletHistory,
         savedCards: updatedUser.savedCards,
         transactionLimit: updatedUser.transactionLimit,
+        walletPin: updatedUser.walletPin,
         token: generateToken(updatedUser._id),
       });
     } else {
@@ -141,19 +157,30 @@ export const addMoneyToWallet = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
+    if (user.isActive === false) {
+      return res.status(401).json({ message: 'Account is deactivated' });
+    }
+    
+    // Ensure savedCards is initialized to prevent crashes
+    if (!user.savedCards) user.savedCards = [];
+
     const payAmount = Number(amount);
+    if (isNaN(payAmount) || payAmount <= 0) return res.status(400).json({ message: 'Invalid amount' });
 
     // If using a saved card, add to card balance and deduct from wallet balance
     if (cardId) {
       const card = user.savedCards.id(cardId);
       if (!card) return res.status(404).json({ message: 'Card not found' });
-      if (user.walletBalance < payAmount) return res.status(400).json({ message: 'Insufficient wallet balance' });
-      card.balance = (card.balance || 0) + payAmount;
-      user.walletBalance -= payAmount;
+      if ((card.balance || 0) < payAmount) return res.status(400).json({ message: 'Insufficient funds on selected card' });
+      card.balance -= payAmount;
+      user.walletBalance = (Number(user.walletBalance) || 0) + payAmount;
     } else {
       // Add to wallet balance
-      user.walletBalance = (user.walletBalance || 0) + payAmount;
+      user.walletBalance = (Number(user.walletBalance) || 0) + payAmount;
     }
+
+    // Failsafe: Prevent NaN in database
+    if (isNaN(user.walletBalance)) user.walletBalance = 0;
 
     user.walletHistory = user.walletHistory || [];
     user.walletHistory.push({
@@ -164,14 +191,16 @@ export const addMoneyToWallet = async (req, res) => {
       cardId: cardId || null,
     });
 
-    if (saveCard && cardDetails) {
+    if (saveCard && cardDetails && cardDetails.number) {
       user.savedCards = user.savedCards || [];
       user.savedCards.push({
+        name: user.name || 'Card Holder',
         brand: 'Visa', // Mock brand detection
         last4: cardDetails.number.slice(-4),
         expiry: cardDetails.expiry,
         balance: 50000 // Mock balance
       });
+      user.markModified('savedCards');
     }
 
     await user.save();
@@ -210,20 +239,7 @@ export const deleteSavedCard = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (user.savedCards) {
-      const cardToDelete = user.savedCards.find(card => card._id.toString() === req.params.id);
-      if (cardToDelete) {
-        // Subtract the card's balance from wallet balance
-        user.walletBalance = (user.walletBalance || 0) - (cardToDelete.balance || 0);
-        // Add to wallet history
-        user.walletHistory = user.walletHistory || [];
-        user.walletHistory.push({
-          type: 'debit',
-          amount: cardToDelete.balance || 0,
-          description: `Card removed: ${cardToDelete.brand} **${cardToDelete.last4}`,
-          date: Date.now(),
-        });
-      }
-      user.savedCards = user.savedCards.filter(card => card._id.toString() !== req.params.id);
+      user.savedCards.pull(req.params.id);
       await user.save();
     }
     res.json(formatUserResponse(user));
@@ -250,12 +266,21 @@ export const updateSavedCard = async (req, res) => {
 
 export const payWithWallet = async (req, res) => {
   try {
-    const { amount, description } = req.body;
+    const { amount, description, pin } = req.body;
     const user = await User.findById(req.user._id);
-    const payAmount = Number(amount);
-    if ((user.walletBalance || 0) < payAmount) return res.status(400).json({ message: 'Insufficient balance' });
+    
+    if (user.walletPin && user.walletPin !== pin) {
+      return res.status(400).json({ message: 'Invalid Wallet PIN' });
+    }
 
-    user.walletBalance -= payAmount;
+    const payAmount = Number(amount);
+    if (isNaN(payAmount) || payAmount <= 0) return res.status(400).json({ message: 'Invalid amount' });
+
+    if ((Number(user.walletBalance) || 0) < payAmount) return res.status(400).json({ message: 'Insufficient balance' });
+
+    user.walletBalance = (Number(user.walletBalance) || 0) - payAmount;
+    if (isNaN(user.walletBalance)) user.walletBalance = 0; // Failsafe
+
     user.walletHistory.push({ type: 'debit', amount: payAmount, description: description || 'Payment', date: Date.now() });
     await user.save();
     res.json(formatUserResponse(user));
@@ -301,7 +326,7 @@ export const getUserStats = async (req, res) => {
     const userId = req.user._id;
 
     // Get user's orders with populated products
-    const orders = await Order.find({ user: userId, isPaid: true }).populate('orderItems.product');
+    const orders = await Order.find({ user: userId, isPaid: true }).sort({ createdAt: -1 }).populate('orderItems.product');
 
     // Category stats: group by product category
     const categoryMap = {};
@@ -309,18 +334,23 @@ export const getUserStats = async (req, res) => {
 
     orders.forEach(order => {
       // Monthly stats
-      const month = new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-      monthlyMap[month] = (monthlyMap[month] || 0) + order.totalPrice;
+      const date = new Date(order.createdAt);
+      const month = !isNaN(date) ? date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : 'Unknown';
+      monthlyMap[month] = (monthlyMap[month] || 0) + (Number(order.totalPrice) || 0);
 
       // Category stats
       order.orderItems.forEach(item => {
         const category = item.product?.category || 'Other';
-        categoryMap[category] = (categoryMap[category] || 0) + (item.price * item.qty);
+        const itemTotal = (Number(item.price) || 0) * (Number(item.qty) || 0);
+        categoryMap[category] = (categoryMap[category] || 0) + itemTotal;
       });
     });
 
-    const categoryStats = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
-    const monthlyStats = Object.entries(monthlyMap).map(([name, amount]) => ({ name, amount }));
+    const categoryStats = Object.entries(categoryMap)
+      .map(([name, value]) => ({ name, value: Number(value) || 0 }))
+      .filter(stat => stat.value > 0);
+      
+    const monthlyStats = Object.entries(monthlyMap).map(([name, amount]) => ({ name, amount: Number(amount) || 0 }));
 
     res.json({ categoryStats, monthlyStats });
   } catch (error) {
@@ -363,23 +393,19 @@ export const deleteUserProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 1. Delete User Orders (Cascade Delete)
-    // This ensures history is removed when the account is deleted
-    try {
-      if (Order) {
-        await Order.deleteMany({ user: user._id });
-      }
-    } catch (err) {
-      console.error("Error deleting user orders:", err);
+    // Soft delete: Deactivate instead of removing
+    user.isActive = false;
+    
+    if (req.body.reason) {
+      user.deactivationReason = req.body.reason;
     }
 
-    // 2. Delete the User
-    await User.deleteOne({ _id: user._id });
+    await user.save();
 
-    res.json({ message: "User and all associated data deleted successfully" });
+    res.json({ message: "Account deactivated successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error deleting account. Please try again." });
+    res.status(500).json({ message: "Server Error deactivating account" });
   }
 };
 
@@ -393,4 +419,5 @@ const formatUserResponse = (user) => ({
   walletHistory: user.walletHistory,
   savedCards: user.savedCards,
   transactionLimit: user.transactionLimit,
+  walletPin: user.walletPin,
 });

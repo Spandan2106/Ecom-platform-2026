@@ -39,6 +39,7 @@ import FAQ from './pages/FAQ';
 import Returns from './pages/Returns';
 import Privacy from './pages/Privacy';
 import Shipping from './pages/Shipping';
+import Careers from "./pages/Careers";
 import Terms from './pages/Terms';
 
 export default function App() {
@@ -103,6 +104,7 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/shipping" element={<Shipping />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/careers" element={<Careers />} />
             
             <Route
               path="/profile"
