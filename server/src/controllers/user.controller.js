@@ -266,8 +266,13 @@ export const updateSavedCard = async (req, res) => {
 
 export const payWithWallet = async (req, res) => {
   try {
-    const { amount, description, pin } = req.body;
+    const { amount, description, pin, orderId } = req.body;
     const user = await User.findById(req.user._id);
+
+    const order = await Order.findById(orderId);
+    if (orderId && !order) {
+      return res.status(404).json({ message: "Order to be paid not found" });
+    }
     
     if (user.walletPin && user.walletPin !== pin) {
       return res.status(400).json({ message: 'Invalid Wallet PIN' });
@@ -282,6 +287,13 @@ export const payWithWallet = async (req, res) => {
     if (isNaN(user.walletBalance)) user.walletBalance = 0; // Failsafe
 
     user.walletHistory.push({ type: 'debit', amount: payAmount, description: description || 'Payment', date: Date.now() });
+
+    if (order) {
+      order.isPaid = true;
+      order.paidAt = Date.now();
+      await order.save();
+    }
+
     await user.save();
     res.json(formatUserResponse(user));
   } catch (error) {
@@ -380,7 +392,12 @@ export const transferCardFunds = async (req, res) => {
   }
 };
 
-export const exportUserData = async (req, res) => { const user = await User.findById(req.user._id).select('-password'); res.json(user); };
+export const exportUserData = async (req, res) => {
+  const user = await User.findById(req.user._id).select('-password');
+  const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
+
+  res.json({ user, orders });
+};
 
 // @desc    Delete user and all associated data (Cascade Delete)
 // @route   DELETE /api/users/profile

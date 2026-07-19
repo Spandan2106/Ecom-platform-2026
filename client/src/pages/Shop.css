@@ -13,7 +13,7 @@
   background: #fff;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(18, 1, 49, 0.05);
   height: fit-content;
   position: sticky;
   top: 100px;
@@ -276,7 +276,7 @@
 .pagination-container button {
   padding: 0.6rem 1.1rem;
   border: 1px solid #ddd;
-  background: #fff;
+  background: #063f4f;
   cursor: pointer;
   border-radius: 6px;
   transition: background 0.2s, color 0.2s, border-color 0.2s;

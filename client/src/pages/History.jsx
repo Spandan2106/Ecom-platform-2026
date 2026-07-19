@@ -6,6 +6,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { QRCodeCanvas } from 'qrcode.react';
 import Skeleton from "../components/Skeleton";
 import { useCart } from "../context/CartContext";
 
@@ -121,72 +122,67 @@ export default function History() {
   };
 
   const generateInvoiceDoc = (order) => {
-    // Helper function to generate PDF document object
-      // 1. Initialize jsPDF
-      if (!user) throw new Error("User information missing");
-      const doc = new jsPDF();
+    if (!user) throw new Error("User information missing");
+    const doc = new jsPDF();
 
-      // 2. Add Logo and Company Details
-      try {
-        // This is a placeholder base64 logo. Replace with your own.
-        const logo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACFSURBVGhD7c+xCQAgFEXRj9e9l9YUhJEgI/7vC84J4Jt5f4A/CRACJkAI+EIgQAiYACFghEAI+EIgQAiYACFghEAI+EIgQAiYACFghEAI+EIgQAiYACFghEAI+EIgQAiYACFghEAI+EIgQAiYACFghEAI+EIgQAiYACFgCg8AAQ9+g34GAAAAAElFTkSuQmCC';
-        doc.addImage(logo, 'PNG', 14, 10, 30, 30);
-      } catch (err) {
-        console.warn("Failed to add logo to invoice", err);
-      }
+    // Logo
+    const logo = '/logo.JPG'; // Assuming logo is in public folder
+    doc.addImage(logo, 'JPG', 14, 10, 30, 30);
 
-      doc.setFontSize(16);
-      doc.setFont("helvetica", "bold");
-      doc.text("We Sell Inc.", 195, 20, { align: "right" });
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.text("123 Ecom Street, Webville", 195, 26, { align: "right" });
-      doc.text("contact@wesell.com", 195, 32, { align: "right" });
+    // Company Details
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("WE_SELL Inc.", 195, 15, { align: "right" });
+    doc.text("123 Ecom Street, Webville", 195, 21, { align: "right" });
+    doc.text("contact@we_sell.com", 195, 27, { align: "right" });
 
-      // 3. Add Invoice Title and Billing Info
-      doc.setFontSize(22);
-      doc.setFont("helvetica", "bold");
-      doc.text("INVOICE", 14, 45);
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.text(`Invoice #: ${order._id}`, 14, 55);
-      doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 14, 61);
+    // Invoice Title
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text("INVOICE", 14, 50);
 
-      doc.setFont("helvetica", "bold");
-      doc.text("Bill To:", 14, 75);
-      doc.setFont("helvetica", "normal");
-      doc.text(user?.name || "Customer", 14, 81);
-      doc.text(order.shippingAddress?.address || "", 14, 87);
-      doc.text(`${order.shippingAddress?.city || ""}, ${order.shippingAddress?.postalCode || ""}`, 14, 93);
+    // Billing Info
+    doc.setFontSize(10);
+    doc.text(`Invoice #: ${order._id}`, 14, 60);
+    doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 14, 66);
+    doc.text(`Status: ${order.isPaid ? 'Paid' : 'Unpaid'}`, 14, 72);
 
-      // 4. Create the table with custom styles
-      autoTable(doc, {
-        startY: 105,
-        head: [['Item', 'Qty', 'Price', 'Total']],
-        body: (order.orderItems || []).map(item => [item.name, item.qty, `₹${(item.price || 0).toFixed(2)}`, `₹${((item.price || 0) * (item.qty || 1)).toFixed(2)}`]),
-        theme: 'striped',
-        headStyles: {
-          fillColor: [38, 50, 56], // Dark header background
-          textColor: [255, 255, 255] // White header text
-        },
-        styles: {
-          font: 'helvetica',
-          fontSize: 10
-        },
-        didDrawPage: function (data) {
-          // 5. Add a footer to each page
-          doc.setFontSize(10);
-          doc.text("Thank you for your business!", 14, doc.internal.pageSize.height - 10);
-        }
-      });
+    doc.setFont("helvetica", "bold");
+    doc.text("Bill To:", 14, 82);
+    doc.setFont("helvetica", "normal");
+    doc.text(user?.name || "Customer", 14, 88);
+    doc.text(order.shippingAddress?.address || "", 14, 94);
+    doc.text(`${order.shippingAddress?.city || ""}, ${order.shippingAddress?.postalCode || ""}`, 14, 100);
 
-      // 6. Add Total and save the document
-      const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : 150;
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text(`Total: ₹${(order.totalPrice || 0).toFixed(2)}`, 195, finalY + 15, { align: "right" });
-      
-      return doc;
+    // Table
+    autoTable(doc, {
+      startY: 110,
+      head: [['Item', 'Qty', 'Price', 'Total']],
+      body: (order.orderItems || []).map(item => [item.name, item.qty, `₹${(item.price || 0).toFixed(2)}`, `₹${((item.price || 0) * (item.qty || 1)).toFixed(2)}`]),
+      theme: 'striped',
+      headStyles: { fillColor: [31, 41, 55] },
+    });
+
+    // Total
+    const finalY = doc.lastAutoTable.finalY;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Total: ₹${(order.totalPrice || 0).toFixed(2)}`, 195, finalY + 15, { align: "right" });
+
+    // QR Code
+    const qrCanvas = document.getElementById(`qr-${order._id}`);
+    if (qrCanvas) {
+      const qrImage = qrCanvas.toDataURL('image/png');
+      doc.addImage(qrImage, 'PNG', 170, finalY + 25, 30, 30);
+      doc.setFontSize(8);
+      doc.text("Scan to view order", 172, finalY + 58);
+    }
+
+    // Footer
+    doc.setFontSize(10);
+    doc.text("Thank you for your business!", 14, doc.internal.pageSize.height - 10);
+
+    return doc;
   };
 
   const downloadInvoice = (order) => {
@@ -274,6 +270,14 @@ export default function History() {
       ) : orders.length === 0 ? <p>No orders found.</p> : (
         <div style={{ display: "grid", gap: "1rem" }}>
           {orders.map(order => (
+            <>
+            <div style={{ display: 'none' }}>
+              <QRCodeCanvas 
+                id={`qr-${order._id}`} 
+                value={`${window.location.origin}/order/${order._id}`} 
+                size={128} 
+              />
+            </div>
             <div key={order._id} className="product-card" style={{ flexDirection: "column", alignItems: "flex-start" }}>
               <div style={{ display: "flex", justifyContent: "space-between", width: "100%", marginBottom: "0.5rem" }}>
                 <span style={{ fontWeight: "bold" }}>Order #{order._id.substring(0, 8)}</span>
@@ -319,6 +323,7 @@ export default function History() {
                 </div>
               </div>
             </div>
+            </>
           ))}
           {pages > 1 && (
             <div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginTop: "1rem" }}>

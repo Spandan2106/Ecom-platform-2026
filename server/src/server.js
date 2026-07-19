@@ -1,4 +1,13 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Explicitly load .env file from the parent 'server' directory.
+// This is the most robust method and avoids issues with working directories.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
 import app from "./app.js";
 import connectDB from "./config/db.js";
 

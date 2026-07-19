@@ -74,38 +74,37 @@ export default function About() {
   };
 
   const stats = [
-    { label: "Users", value: "110M+" },
-    { label: "Products Sold", value: "160M+" },
-    { label: "Transacted", value: "$90B+" },
-    { label: "Net Worth", value: "$20B" },
-    { label: "Countries", value: "82" },
-    { label: "Employees", value: "200k+" },
-    { label: "Engineers", value: "2k+" },
+    { label: "Users", value: "100M+" },
+    { label: "Products Sold", value: "6M+" },
+    { label: "Transacted", value: "$500M+" },
+    { label: "Net Worth", value: "$2B" },
+    { label: "Countries", value: "23" },
+    { label: "Employees", value: "20k+" },
+    { label: "Engineers", value: "120+" },
     { label: "Founded", value: "2020" },
-    { label: "Offices", value: "75" },
-    { label: "Warehouses", value: "250" },
-    { label: "Daily Visitors", value: "5M+" },
+    { label: "Offices", value: "15" },
+    { label: "Warehouses", value: "75" },
+    { label: "Daily Visitors", value: "20K+" },
     { label: "Customer Satisfaction", value: "98%" },
     { label: "Return Rate", value: "5%" },
-    { label: "Mobile App Downloads", value: "50M+" },
+    { label: "Mobile App Downloads", value: "1M+" },
     { label: "Average Delivery Time", value: "3 Days" },
     { label: "Support Tickets Resolved", value: "1M+" }
   ];
 
   const timelineEvents = [
     { year: "2020", title: "Founded", description: "WE_SELL.com was founded by Spandan Das in a his home first as a website in San Francisco." },
-    { year: "2021", title: "First Funding", description: "Secured $5 Million in seed funding from top venture capitalists." },
-    { year: "2021", title: "10 Million Users", description: "Reached our first major milestone of 10 million active users." },
+    { year: "2021", title: "First Funding", description: "Secured 250000$ in seed funding from top venture capitalists." },
+    { year: "2021", title: "10 Million Users", description: "Reached our first major milestone of 1 million active users." },
     { year: "2022", title: "Global Expansion", description: "Launched operations in Europe and Asia." },
-    { year: "2022", title: "50 Million Products", description: "Surpassed 50 million products listed on our platform." },
+    { year: "2022", title: "0.7 Million Products", description: "Surpassed 0.5 million products listed on our platform." },
     { year: "2023", title: "Mobile App", description: "Released our top-rated mobile application for iOS and Android." },
-    { year: "2024", title: "$20B Transactions", description: "Facilitated over $20 Billion in GMV." },
+    { year: "2024", title: "$500M+ Transactions", description: "Facilitated over $500 Million in GMV." },
     { year: "2024", title: "20 Million Users", description: "Doubled our user base to 20 million active users." },
     { year: "2025", title: "Sustainability Goal", description: "Achieved 100% carbon neutral shipping." },
-    { year: "2025", title: "100 Million Products", description: "Reached 100 million products listed on our platform." },
-    { year: "2025", title : "Global Leader", description: "Recognized as a top 10 global e-commerce platform." },
-    { year: "2026", title: "30 Million Users", description: "Projected to reach 30 million active users." },
-    { year: "2026", title: "New Frontiers", description: "Expanding into IT and Energy sectors with over 2,000 engineers." },
+    { year: "2025", title: "6 Million Products", description: "Reached 6 million products listed on our platform." },
+    { year: "2025", title : "Global Leader", description: "Recognized as a top 20 global e-commerce platform." },
+    { year: "2026", title: "30 Million Users", description: "Projected to reach 30 million active users." }
   ];
 
   const teamMembers = [
@@ -176,7 +175,7 @@ export default function About() {
     },
     {
       question: "Where are you located?",
-      answer: "We are headquartered in San Francisco, California, with fulfillment centers across the United States and also in 82 countries to ensure fast delivery."
+      answer: "We are headquartered in San Francisco, California, with fulfillment centers across the United States and also in 23 countries to ensure fast delivery."
     },
     {
       question: "How do I create an account?",
@@ -223,9 +222,8 @@ export default function About() {
             Founded by Spandan Das and his visionary team, we have grown from a small startup to a trusted name in the digital marketplace.
           </p>
           <p className="text-muted">
-            We have expanded our reach to serve customers in over 82 countries. Our platform now hosts over 50 million users and has facilitated over $90 Billion in transactions.
-            With a dedicated workforce of over 200,000 employees, including more than 2,000 software engineers, and a net worth of $20 Billion, we ensure excellence in every interaction.
-            We are also rapidly expanding into the IT and Energy sectors.
+            We have expanded our reach to serve customers in over 23 countries. Our platform now hosts over 50 million users and has facilitated over $90 Billion in transactions.
+            With a dedicated workforce of over 20000 employees, including more than 100 software engineers, and a net worth of $2 Billion, we ensure excellence in every interaction.
           </p>
           
           <div className="stats-grid">

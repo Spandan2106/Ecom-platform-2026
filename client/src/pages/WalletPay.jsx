@@ -60,37 +60,34 @@ export default function WalletPay() {
         return;
       }
 
-      // 1. Deduct from Wallet
-      // This returns the updated user object with new balance and history
-      const { data: updatedUser } = await axios.post(
-        `${API_URL}/api/users/wallet/pay`,
-        { amount: payAmount, description: `Order Payment`, pin: pin },
-        config
-      );
-
-      // 2. Create Order
+      // 1. Create Order first to get an orderId
       const orderData = {
         orderItems: items.map(item => ({
           name: item.name,
-          qty: 1,
+          qty: item.qty || 1,
           image: item.image,
           price: item.price,
           product: item._id
         })),
         shippingAddress: address,
         paymentMethod: "Wallet",
-        totalPrice: payAmount,
-        isPaid: true,
-        paidAt: Date.now(),
-        paymentResult: {
-            id: `WALLET_${Date.now()}`,
-            status: "COMPLETED",
-            update_time: String(Date.now()),
-            email_address: user.email
-        }
+        totalPrice: payAmount
       };
 
-      await axios.post(`${API_URL}/api/orders`, orderData, config);
+      const { data: createdOrder } = await axios.post(`${API_URL}/api/orders`, orderData, config);
+      const orderId = createdOrder._id;
+
+      // 2. Deduct from Wallet and mark the order as paid
+      const { data: updatedUser } = await axios.post(
+        `${API_URL}/api/users/wallet/pay`,
+        { 
+          amount: payAmount, 
+          description: `Payment for Order #${orderId.substring(0, 8)}`, 
+          pin: pin,
+          orderId: orderId // Pass the orderId to the backend
+        },
+        config
+      );
 
       // 3. Update Local State immediately so Profile/Wallet pages are fresh
       if (updatedUser) updateUser(updatedUser);

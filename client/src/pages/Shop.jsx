@@ -104,8 +104,8 @@ export default function Shop() {
   return (
     <div className="shop-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
       <div style={{ width: '100%', marginBottom: '1rem', display: 'block' }}>
-        <button onClick={() => setShowFilters(!showFilters)} style={{ padding: '0.5rem 1rem', background: '#eee', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-          {showFilters ? "Hide Filters" : "Show Filters ⇩"}
+        <button onClick={() => setShowFilters(!showFilters)} style={{ padding: '0.5rem 1rem', background: '#0e0539', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+          {showFilters ? "Hide Filters ⇩" : "Show Filters ⇩"}
         </button>
       </div>
 
@@ -113,7 +113,7 @@ export default function Shop() {
       {showFilters && (
       <aside className="shop-sidebar">
         <div className="filter-group">
-          <h3>Categories</h3>
+          <h3>Categories ⇩⇩</h3>
           <ul className="category-list">
             {categories.map(cat => (
               <li 

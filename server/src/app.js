@@ -10,7 +10,7 @@ import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import xss from "xss-clean";
 import paymentRoutes from "./routes/payment.routes.js";
-import userRoutes from "./routes/userRoutes.js";
+import userRoutes from "./routes/user.routes.js";
 
 
 
@@ -36,7 +36,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api", apiLimiter);
-app.use("/api/payment", paymentRoutes);
+app.use("/api/payments", paymentRoutes);
 app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => {

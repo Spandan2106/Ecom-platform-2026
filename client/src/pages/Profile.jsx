@@ -3,7 +3,6 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import { saveAs } from "file-saver";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import "./Profile.css";
 
@@ -20,12 +19,12 @@ export default function Profile() {
   const { user, logout, notify, fetchUser } = useAuth();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deactivationReason, setDeactivationReason] = useState("");
-  const [isDeactivating, setIsDeactivating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const [stats, setStats] = useState({ categoryStats: [], monthlyStats: [] });
   const prevBalance = useRef(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = (import.meta.env.VITE_API_URL || "https://ecom-api-paxi.onrender.com").replace(/\/$/, "");
 
   useEffect(() => {
     fetchUser();
@@ -58,7 +57,7 @@ export default function Profile() {
 
         const config = { headers: { Authorization: `Bearer ${token}` } };
         // Fetch Stats
-        // Add timestamp to prevent caching and ensure real-time data
+        // Add timestamp to prevent caching and ensure real-time data.
         const statsRes = await axios.get(`${API_URL}/api/users/stats?t=${Date.now()}`, config);
         setStats(statsRes.data);
       } catch (error) {
@@ -71,10 +70,10 @@ export default function Profile() {
     fetchUserProfile();
   }, [user]);
 
-  const confirmDeactivateAccount = async () => {
+  const confirmDeleteAccount = async () => {
     try {
       if (!user) return;
-      setIsDeactivating(true);
+      setIsDeleting(true);
       const token = localStorage.getItem("token");
       if (!token) return;
 
@@ -84,32 +83,15 @@ export default function Profile() {
       };
       await axios.delete(`${API_URL}/api/users/profile`, config);
       clearCart();
-      notify("Account deactivated successfully.");
+      notify("Account deleted permanently.");
       setTimeout(() => logout(), 1000); // Slight delay to ensure notification is seen
     } catch (error) {
-      console.error("Error deactivating account:", error);
-      notify(error.response?.data?.message || "Failed to deactivate account.", "error");
+      console.error("Error deleting account:", error);
+      notify(error.response?.data?.message || "Failed to delete account.", "error");
     } finally {
       setShowDeleteModal(false);
       setDeactivationReason("");
-      setIsDeactivating(false);
-    }
-  };
-
-  const handleExportData = async () => {
-    try {
-      if (!user) return;
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const config = { headers: { Authorization: `bearer ${token}` } };
-      const { data } = await axios.get(`${API_URL}/api/users/export`, config);
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      saveAs(blob, `user_data_backup_${new Date().getTime()}.json`);
-      notify("Data exported successfully");
-    } catch (error) {
-      console.error("Export error:", error);
-      notify("Failed to export data. Please try again.", "error");
+      setIsDeleting(false);
     }
   };
 
@@ -188,28 +170,21 @@ export default function Profile() {
         </Link>
         
         <button 
-          onClick={handleExportData} 
-          className="action-btn btn-secondary"
-        >
-          Export My Data
-        </button>
-
-        <button 
           onClick={() => setShowDeleteModal(true)} 
           className="action-btn btn-danger"
         >
-          Deactivate Account
+          Delete Account
         </button>
       </div>
 
       {showDeleteModal && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h3 className="modal-title-danger">Deactivate Account?</h3>
-            <p>Are you sure you want to deactivate your account? You will be logged out and won't be able to access your data until you reactivate it.</p>
+            <h3 className="modal-title-danger">Delete Account?</h3>
+            <p>Are you sure you want to permanently delete your account? All your data, including order history, will be lost forever. This action cannot be undone.</p>
             
             <div className="modal-survey">
-              <label htmlFor="deactivation-reason">Please tell us why you are leaving:</label>
+              <label htmlFor="deactivation-reason">Please tell us why you are leaving (Optional):</label>
               <select 
                 id="deactivation-reason"
                 className="modal-select"
@@ -227,7 +202,7 @@ export default function Profile() {
 
             <div className="modal-actions">
               <button onClick={() => { setShowDeleteModal(false); setDeactivationReason(""); }} className="modal-btn btn-secondary">Cancel</button>
-              <button onClick={confirmDeactivateAccount} disabled={isDeactivating} className="modal-btn btn-danger">{isDeactivating ? "Deactivating..." : "Yes, Deactivate"}</button>
+              <button onClick={confirmDeleteAccount} disabled={isDeleting} className="modal-btn btn-danger">{isDeleting ? "Deleting..." : "Yes, Delete"}</button>
             </div>
           </div>
         </div>
