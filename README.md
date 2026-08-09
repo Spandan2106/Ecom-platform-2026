@@ -18,8 +18,7 @@ A modern, full-stack e-commerce application built with the MERN stack (MongoDB, 
   - Visual spending analytics (Charts).
   - Order history tracking.
   - Profile management.
-  - Data export functionality.
-- **Dark Mode**: System-wide dark/light theme toggle.
+  - Data export functionality
 
 ### General
 - **Responsive Design**: Optimized for mobile and desktop.
