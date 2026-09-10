@@ -43,6 +43,7 @@ git clone <repository-url>
 cd Ecom-platform-2026
 ```
 
+
 ### 2. Backend Setup
 Navigate to the server directory and install dependencies:
 ```bash
