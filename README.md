@@ -64,3 +64,50 @@ Ecom-platform-2026/
 │   ├── middleware/         # Auth & error handling middlewares
 │   └── server.js           # App entry point
 └── README.md
+```
+**🔌 API Endpoints Overview**
+| Method | Endpoint | Description |
+* | :管 | :--- | :--- |
+* | POST | ```/api/auth/register``` | Register a new user |
+* | POST | ```/api/auth/login``` | Authenticate user & return JWT |
+* | GET | ```/api/products``` | Fetch all products with filter/search options |
+* | GET | ```/api/wallet``` | Fetch current user wallet balance & history |
+* | POST |``` /api/wallet/transfer``` | Transfer funds between users/cards |
+
+**⚙️ Getting Started Locally**
+Prerequisites
+Make sure you have Node.js and MongoDB installed on your system.
+
+1. **Clone the Repository**
+```Bash
+git clone [https://github.com/Spandan2106/Ecom-platform-2026.git](https://github.com/Spandan2106/Ecom-platform-2026.git)
+cd Ecom-platform-2026
+```
+2. **Setup the Backend**
+```Bash
+cd server
+npm install
+```
+Create a ```.env``` file inside the ```server/``` directory and configure your environment variables:
+
+```Code snippet
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret_key
+```
+Start the server:
+
+```Bash
+npm run dev
+```
+3. **Setup the Frontend**
+Open a new terminal tab and navigate to the client folder:
+
+```Bash
+cd client
+npm install
+npm run dev
+```
+**📜 License**
+Distributed under the ```MIT License```. See ```LICENSE``` for more information.
+
