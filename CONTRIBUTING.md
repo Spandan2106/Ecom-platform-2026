@@ -38,3 +38,20 @@ Ready to write some code? Follow these steps to ensure a smooth review process:
 1. **Fork** the repository and create your feature branch from `main`:
    ```bash
    git checkout -b feature/your-awesome-feature
+   ```
+2. **Write clean, readable code** adhering to the project's style guidelines.
+
+3. **Test locally**—make sure both the frontend and backend run seamlessly without any errors.
+
+4. **Submit a Pull Request** with a clear description of your changes and reference any related issues.
+
+**⚙️ Development Setup**
+Get the project running locally on your machine in just a few steps:
+
+1. **Clone the repository:**
+
+```Bash
+git clone [https://github.com/Spandan2106/Ecom-platform-2026.git](https://github.com/Spandan2106/Ecom-platform-2026.git)
+cd Ecom-platform-2026
+```
+2. Follow the setup instructions in the main README to install dependencies and configure your environment variables.
