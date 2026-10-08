@@ -74,6 +74,23 @@ Ecom-platform-2026/
 * | GET | ```/api/wallet``` | Fetch current user wallet balance & history |
 * | POST |``` /api/wallet/transfer``` | Transfer funds between users/cards |
 
+
+## 📈 Performance Testing
+
+Load tested the backend using Grafana k6 against the
+```GET /api/products``` endpoint.
+
+| VUs | p95 Latency | Failure Rate |
+|-----|-------------|--------------|
+| 50  | 0.97s       | 0%           |
+| 75  | 1.52s       | 0%           |
+| 150 | 2.97s       | 0%           |
+| 250 | 4.88s       | 0%           |
+| 500 | 8.46s       | 19.52%       |
+| 5000| 19.53s      | 92.57%       |
+
+Note: ***The test identified significant latency degradation at higher concurrency and connection failures beginning around 500 VUs.***
+
 **⚙️ Getting Started Locally**
 Prerequisites
 Make sure you have Node.js and MongoDB installed on your system.
