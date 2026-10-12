@@ -1,4 +1,7 @@
+[![Architecture diagram](https://gitdiagram.com/diagram-badge.svg)](https://gitdiagram.com/spandan2106/ecom-platform-2026?utm_source=readme&utm_medium=badge)
 <div align="center">
+
+[![Architecture diagram of spandan2106/ecom-platform-2026](https://gitdiagram.com/spandan2106/ecom-platform-2026/diagram.png)](https://gitdiagram.com/spandan2106/ecom-platform-2026?utm_source=readme&utm_medium=picture)
 
 # 🛍️ WE_SELL - E-commerce Platform 2026
 
